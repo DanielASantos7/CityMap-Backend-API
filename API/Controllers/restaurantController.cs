@@ -1,11 +1,12 @@
-﻿using API.Models;
+﻿using API.DTOs;
+using API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
     [ApiController]
-    [Route("system/api/[controller]")]
+    [Route("/system/api/[controller]")]
     public class restaurantController : ControllerBase
     {
         public readonly Model1Context db;
@@ -60,54 +61,51 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetRestaurante(int id)
+        [HttpGet("{restaurantId}")]
+        public async Task<IActionResult> GetRestaurante(int restaurantId)
         {
-            if (string.IsNullOrWhiteSpace(id.ToString()))
+            if (string.IsNullOrWhiteSpace(restaurantId.ToString()))
                 return BadRequest(new ResponseApi<string>(400, "Esse restaurante não existe", null));
 
-            var restaurante = await db.Restaurants
-                .Where(r => r.RestaurantId == id)
-                .Select(r => new RestaurantDto
-                {
-                    RestaurantId = r.RestaurantId,
-                    RestaurantName = r.RestaurantName,
-                    Address = r.Address,
-                    Phone = r.Phone,
-                    Rating = r.Rating.ToString(),
-                    PriceRange = r.PriceRange,
-                    RestaurantType = r.RestaurantType,
-                    ImageUrl = r.ImageUrl,
-                    Description = r.Description,
-                    Distance = r.Distance.ToString(),
-                    BusinessType = r.BusinessType,
-                })
+            var r = await db.Restaurants
+                .Where(r => r.RestaurantId == restaurantId)
                 .FirstOrDefaultAsync();
 
-            if (restaurante == null)
+            if (r == null)
                 return Ok(new ResponseApi<string>(400, "Esse restaurante não existe", null));
 
+            var res = new RestaurantDto
+            {
+                BusinessHours = r.BusinessHours,
+                RemainingParkingSpaces = r.RemainingParkingSpaces,
+                RestaurantId = r.RestaurantId,
+                RestaurantName = r.RestaurantName,
+                Address = r.Address,
+                Phone = r.Phone,
+                Rating = r.Rating.ToString(),
+                PriceRange = r.PriceRange,
+                RestaurantType = r.RestaurantType,
+                ImageUrl = r.ImageUrl,
+                Description = r.Description,
+                Distance = r.Distance.ToString(),
+                BusinessType = r.BusinessType,
+            };
 
-            return Ok(new ResponseApi<RestaurantDto>(200, "sucess", restaurante));
+
+            return Ok(new ResponseApi<RestaurantDto>(200, "success", res));
         }
 
 
     }
 }
 
-public record ResponseApi<T>(
-    int code,
-    string msg,
-    T? data
-    );
-
-public record PageData<T>(
-    int Total,
-    IEnumerable<T> Rows
-    );
-
 public class RestaurantDto
 {
+
+
+
+    public string BusinessHours { get; set; }
+    public int? RemainingParkingSpaces { get; set; }
     public int RestaurantId { get; set; }
     public string RestaurantName { get; set; }
     public string Address { get; set; }
