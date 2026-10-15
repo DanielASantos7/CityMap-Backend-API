@@ -39,7 +39,7 @@ namespace API.Controllers
             var lista = await query
                 .Skip((page - 1) * size)
                 .Take(size)
-                .Select(r => new RestauranteDto
+                .Select(r => new RestaurantDto
                 {
                     RestaurantId = r.RestaurantId,
                     RestaurantName = r.RestaurantName,
@@ -47,7 +47,7 @@ namespace API.Controllers
                     Phone = r.Phone,
                     Rating = r.Rating.ToString(),
                     PriceRange = r.PriceRange,
-                    RestauranteType = r.RestaurantType,
+                    RestaurantType = r.RestaurantType,
                     ImageUrl = r.ImageUrl,
                     Description = r.Description,
                     Distance = r.Distance.ToString(),
@@ -55,17 +55,12 @@ namespace API.Controllers
                 })
                 .ToListAsync();
 
-            if (lista.Count <= 0)
-            {
-                return Ok(new ResponseApi<string>(200, "Não há restaurantes", null));
-            }
-
-            var pageData = new PageData<RestauranteDto>(total, lista);
-            return Ok(new ResponseApi<PageData<RestauranteDto>>(200, "success", pageData));
+            var pageData = new PageData<RestaurantDto>(total, lista);
+            return Ok(new ResponseApi<PageData<RestaurantDto>>(200, "success", pageData));
         }
 
 
-        [HttpGet("restaurantId")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetRestaurante(int id)
         {
             if (string.IsNullOrWhiteSpace(id.ToString()))
@@ -73,7 +68,7 @@ namespace API.Controllers
 
             var restaurante = await db.Restaurants
                 .Where(r => r.RestaurantId == id)
-                .Select(r => new RestauranteDto
+                .Select(r => new RestaurantDto
                 {
                     RestaurantId = r.RestaurantId,
                     RestaurantName = r.RestaurantName,
@@ -81,7 +76,7 @@ namespace API.Controllers
                     Phone = r.Phone,
                     Rating = r.Rating.ToString(),
                     PriceRange = r.PriceRange,
-                    RestauranteType = r.RestaurantType,
+                    RestaurantType = r.RestaurantType,
                     ImageUrl = r.ImageUrl,
                     Description = r.Description,
                     Distance = r.Distance.ToString(),
@@ -90,10 +85,10 @@ namespace API.Controllers
                 .FirstOrDefaultAsync();
 
             if (restaurante == null)
-                return NotFound(new ResponseApi<string>(404, "Não foi possivel encontrar esse restaurante", null));
+                return Ok(new ResponseApi<string>(400, "Esse restaurante não existe", null));
 
 
-            return Ok(new ResponseApi<RestauranteDto>(200, "sucess", restaurante));
+            return Ok(new ResponseApi<RestaurantDto>(200, "sucess", restaurante));
         }
 
 
@@ -111,7 +106,7 @@ public record PageData<T>(
     IEnumerable<T> Rows
     );
 
-public class RestauranteDto
+public class RestaurantDto
 {
     public int RestaurantId { get; set; }
     public string RestaurantName { get; set; }
@@ -119,7 +114,7 @@ public class RestauranteDto
     public string Phone { get; set; }
     public string Rating { get; set; }
     public string PriceRange { get; set; }
-    public string RestauranteType { get; set; }
+    public string RestaurantType { get; set; }
     public string ImageUrl { get; set; }
     public string Description { get; set; }
     public string Distance { get; set; }
