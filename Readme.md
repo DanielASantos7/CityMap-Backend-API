@@ -6,7 +6,7 @@
 
 Este projeto é a Web API para uma prova sobre um aplicativo de mapa.
 
-Este projeto nasceu de uma prova da WorldSkills, devido á restirção de tempo da prova (máximo de 2h30 para desenvolver o backend e mobile), a estrutura do código foi focada na velocidade de desenvolvimento e no cumprimento exato dos requsitos de respostas exigidos.
+Este projeto nasceu de uma prova da WorldSkills, devido á restrição de tempo da prova (máximo de 2h30 para desenvolver o backend e mobile), a estrutura do código foi focada na velocidade de desenvolvimento e no cumprimento exato dos requsitos de respostas exigidos.
 
 
 
