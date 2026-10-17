@@ -1,0 +1,39 @@
+# Nome que aparecerá na aba Actions do GitHub
+name: Testes automatizados .NET 
+
+# on -> Define quais eventos disparam a automação
+on:
+  #dispara o workflow quando envia commits ao GitHub
+  push:
+    # Dispara o workflow quando um PR é aberto ou atualizado, conforme os eventos configurados
+    pull_request:
+
+# Define os trabalhos que serão executados
+jobs:
+  # Identificador do trabalho responsável pelos testes
+  test:
+    # Define o OS da VM
+    runs-on: ubuntu-latest
+
+    # Lista de etapas executadas em sequência
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          # Seleciona uma versão da linha 8.0.x do SDK
+          dotnet-version: 8.0.x
+
+      # Restaura as dependências dos projetos da solution
+      - name: Restaurar dependências
+        run: dotnet restore Mundial.V1.slnx
+
+      # Compila a solução sem restaurar as dependências novamente
+      - name: Compilar solução
+        run: dotnet build Mundial.V1.slnx --no-restore
+
+      # Executa os testes sem recompilar a solução
+      - name: Executar testes
+        run: dotnet test Mundial.V1.slnx --no-build --logger "console;verbosity=normal"
