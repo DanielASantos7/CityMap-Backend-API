@@ -74,7 +74,7 @@ namespace API.Tests
 
 
         [Fact]
-        public async Task Login_ComCredenciaisValidas_DeveRetornarToken() 
+        public async Task Login_ComCredenciaisValidas_DeveRetornarToken()
         {
             var options = new DbContextOptionsBuilder<Model1Context>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -83,8 +83,9 @@ namespace API.Tests
             using var context = new Model1Context(options);
             var controller = new authController(context);
 
-            context.Users.Add(new User { UserName = "usuario_valido", Password = "senha_valida", Email = "email_valido@email.com" });
+            var usuario = new User { UserName = "usuario_valido", Password = "senha_valida", Email = "email_valido@email.com" };
 
+            await context.Users.AddAsync(usuario);
             await context.SaveChangesAsync();
 
             var dto = new LoginDTO
@@ -112,6 +113,10 @@ namespace API.Tests
 
             var token = propriedadeToken.GetValue(dados) as string;
             Assert.False(string.IsNullOrWhiteSpace(token));
+
+            Assert.Equal(usuario.UserId, UsuarioAtual.UserId);
+            Assert.Equal(token, UsuarioAtual.Token);
+            Assert.True(UsuarioAtual.Expired > DateTime.Now);
         }
 
         [Fact]
@@ -149,8 +154,8 @@ namespace API.Tests
         [InlineData("", "senha_valida")]
         [InlineData("usuario_valido", "")]
         public async Task Login_ComApenasUmCampoVazio_DeveRetornarBadRequest(
-    string username,
-    string password)
+            string username,
+            string password)
         {
             var options = new DbContextOptionsBuilder<Model1Context>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
