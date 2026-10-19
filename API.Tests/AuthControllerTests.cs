@@ -144,5 +144,37 @@ namespace API.Tests
             Assert.Null(UsuarioAtual.Token);
             Assert.Equal(DateTime.MinValue, UsuarioAtual.Expired);
         }
+
+        [Theory]
+        [InlineData("", "senha_valida")]
+        [InlineData("usuario_valido", "")]
+        public async Task Login_ComApenasUmCampoVazio_DeveRetornarBadRequest(
+    string username,
+    string password)
+        {
+            var options = new DbContextOptionsBuilder<Model1Context>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            using var context = new Model1Context(options);
+
+            var controller = new authController(context);
+
+            var dto = new LoginDTO
+            {
+                Username = username,
+                Password = password
+            };
+
+            var resultado = await controller.login(dto);
+
+            var resposta = Assert.IsType<BadRequestObjectResult>(resultado);
+
+            var corpo = Assert.IsType<ResponseApi<string>>(resposta.Value);
+
+            Assert.Equal(400, corpo.code);
+            Assert.Equal("Preencha todos os campos", corpo.msg);
+            Assert.Null(corpo.data);
+        }
     }
 }
