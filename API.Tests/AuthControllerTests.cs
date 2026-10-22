@@ -156,6 +156,10 @@ namespace API.Tests
         public async Task Login_ComApenasUmCampoVazio_DeveRetornarBadRequest(
             string username,
             string password)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 25085e4 (test(auth): cover incorrect password for existing user)
         {
             var options = new DbContextOptionsBuilder<Model1Context>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -179,6 +183,39 @@ namespace API.Tests
 
             Assert.Equal(400, corpo.code);
             Assert.Equal("Preencha todos os campos", corpo.msg);
+            Assert.Null(corpo.data);
+        }
+
+        [Fact]
+        public async Task Login_ComUsuarioValidoESenhaIncorreta_DeveRetornarUnauthorized()
+        {
+            var options = new DbContextOptionsBuilder<Model1Context>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            using var context = new Model1Context(options);
+            var controller = new authController(context);
+
+            context.Users.Add(new User { UserName = "usuario_valido", Password = "incorreta", Email = "email_valido@email.com" });
+
+            await context.SaveChangesAsync();
+
+            var dto = new LoginDTO
+            {
+                Username = "usuario_valido",
+                Password = "senha_valida"
+            };
+
+            var resultado = await controller.login(dto);
+
+            var resposta = Assert.IsType<OkObjectResult>(resultado);
+
+            Assert.Equal(200, resposta.StatusCode);
+
+            var corpo = Assert.IsType<ResponseApi<string>>(resposta.Value);
+
+            Assert.Equal(400, corpo.code);
+            Assert.Equal("Credenciais inválidas", corpo.msg);
             Assert.Null(corpo.data);
         }
     }
