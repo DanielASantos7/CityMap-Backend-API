@@ -156,10 +156,7 @@ namespace API.Tests
         public async Task Login_ComApenasUmCampoVazio_DeveRetornarBadRequest(
             string username,
             string password)
-<<<<<<< HEAD
-=======
 
->>>>>>> 25085e4 (test(auth): cover incorrect password for existing user)
         {
             var options = new DbContextOptionsBuilder<Model1Context>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
